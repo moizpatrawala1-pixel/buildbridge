@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — BuildBridge</title>
+<link rel="stylesheet" href="style.css">
+<style>
+
+.dash-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 72px); }
+
+.dash-sidebar { background: var(--charcoal); color: var(--paper); padding: 32px 0; }
+.dash-nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 28px;
+  font-size: 14px;
+  color: rgba(246,244,239,0.6);
+  border-left: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+.dash-nav-item:hover { color: var(--paper); }
+.dash-nav-item.active { color: var(--paper); border-left-color: var(--amber); background: rgba(255,255,255,0.04); }
+.dash-nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+.dash-sidebar-section { padding: 0 28px; margin: 24px 0 10px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(246,244,239,0.35); }
+
+.dash-main { padding: 40px 44px; max-width: 980px; }
+
+.dash-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 36px; flex-wrap: wrap; gap: 16px; }
+.dash-head h1 { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: -0.015em; margin-bottom: 6px; }
+.dash-head p { color: var(--ink-dim); font-size: 14.5px; }
+
+.stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+.stat-card { background: var(--white); border: 1px solid var(--line); border-radius: 6px; padding: 20px; }
+.stat-card .n { font-family: var(--mono); font-weight: 600; font-size: 24px; display: block; margin-bottom: 4px; }
+.stat-card .l { font-size: 12px; color: var(--ink-dim); }
+.stat-card .n.amber { color: var(--amber); }
+
+/* POST PROJECT FORM */
+.post-form-box { background: var(--white); border: 1px solid var(--line); border-radius: 6px; padding: 32px; margin-bottom: 40px; }
+.post-form-box h3 { font-family: var(--display); font-weight: 600; font-size: 19px; margin-bottom: 6px; }
+.post-form-box .sub { font-size: 13.5px; color: var(--ink-dim); margin-bottom: 26px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-field { margin-bottom: 20px; }
+.form-field.full { grid-column: 1 / -1; }
+.form-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.form-field input, .form-field select, .form-field textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-family: var(--body);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--paper);
+}
+.form-field textarea { resize: vertical; min-height: 90px; }
+.form-hint { font-size: 12px; color: var(--ink-dim); margin-top: 6px; }
+
+/* REQUEST TRACKER */
+.req-table { width: 100%; border-collapse: collapse; }
+.req-table th {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.req-table td { padding: 16px; border-bottom: 1px solid var(--line); font-size: 14px; vertical-align: middle; }
+.req-table tr:last-child td { border-bottom: none; }
+
+.req-name-cell { display: flex; align-items: center; gap: 10px; }
+.req-avatar { width: 32px; height: 32px; border-radius: 6px; background: var(--charcoal); color: var(--amber-soft); font-family: var(--display); font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.status-pill { font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 20px; display: inline-block; }
+.status-pending { background: rgba(212,115,42,0.12); color: var(--amber); }
+.status-called { background: var(--verified-soft); color: var(--verified); }
+.status-declined { background: rgba(107,109,114,0.12); color: var(--ink-dim); }
+
+.section-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.section-title-row h3 { font-family: var(--display); font-weight: 600; font-size: 18px; }
+
+@media (max-width: 900px) {
+  .dash-layout { grid-template-columns: 1fr; }
+  .dash-sidebar { display: none; }
+  .dash-main { padding: 28px 20px; }
+  .stat-cards { grid-template-columns: 1fr 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .req-table { display: block; overflow-x: auto; }
+}
+
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-mark"></span>
+      BuildBridge
+    </a>
+    <div class="nav-links">
+      <a href="browse.html">Browse Contractors</a>
+      <a href="index.html#how-it-works">How It Works</a>
+      <a href="index.html#model">For Suppliers</a>
+      <a href="dashboard.html" class="active">Post a Project</a>
+    </div>
+    <div class="nav-cta-group">
+      <span class="nav-signin">Moiz D.</span>
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:13px;color:white;">MD</div>
+    </div>
+  </div>
+</nav>
+
+<div class="dash-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-section">Overview</div>
+    <a href="#" class="dash-nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      Dashboard
+    </a>
+    <a href="#" class="dash-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+      Quotation Requests
+    </a>
+    <a href="#" class="dash-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path></svg>
+      Shortlisted
+    </a>
+    <a href="browse.html" class="dash-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      Browse Contractors
+    </a>
+
+    <div class="dash-sidebar-section">Account</div>
+    <a href="#" class="dash-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      Profile
+    </a>
+    <a href="#" class="dash-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+      Settings
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    <div class="dash-head">
+      <div>
+        <h1>Welcome back, Moiz</h1>
+        <p>Here's what's happening with your quotation requests.</p>
+      </div>
+      <button class="btn btn-amber" onclick="document.getElementById('postForm').scrollIntoView({behavior:'smooth'})">+ Post New Project</button>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <span class="n amber">6</span>
+        <span class="l">Active Quotation Requests</span>
+      </div>
+      <div class="stat-card">
+        <span class="n">4</span>
+        <span class="l">Contractors Called Back</span>
+      </div>
+      <div class="stat-card">
+        <span class="n">9</span>
+        <span class="l">Shortlisted Contractors</span>
+      </div>
+      <div class="stat-card">
+        <span class="n">2</span>
+        <span class="l">Projects In Progress</span>
+      </div>
+    </div>
+
+    <!-- POST PROJECT -->
+    <div class="post-form-box" id="postForm">
+      <h3>Post a New Project</h3>
+      <p class="sub">Fill this out once, then select contractors to notify — no need to repeat details per contractor.</p>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Project title</label>
+          <input type="text" placeholder="e.g. 4BHK Interior Fit-out, Powai">
+        </div>
+        <div class="form-field">
+          <label>Type of work needed</label>
+          <select>
+            <option>Interior Fit-out</option>
+            <option>RCC &amp; Structural</option>
+            <option>Electrical &amp; MEP</option>
+            <option>Plumbing</option>
+            <option>Waterproofing</option>
+            <option>Facade &amp; Cladding</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Location</label>
+          <input type="text" placeholder="Area, City">
+        </div>
+        <div class="form-field">
+          <label>Estimated budget</label>
+          <select>
+            <option>Under ₹25 L</option>
+            <option>₹25 L – ₹75 L</option>
+            <option>₹75 L – ₹2 Cr</option>
+            <option>₹2 Cr+</option>
+          </select>
+        </div>
+        <div class="form-field full">
+          <label>Project description</label>
+          <textarea placeholder="Scope of work, timeline, any specific requirements..."></textarea>
+        </div>
+        <div class="form-field">
+          <label>Your contact number</label>
+          <input type="tel" placeholder="+91 00000 00000">
+          <p class="form-hint">Only shared with contractors you select to notify.</p>
+        </div>
+        <div class="form-field">
+          <label>Preferred start date</label>
+          <input type="date">
+        </div>
+      </div>
+
+      <button class="btn btn-dark">Save &amp; Choose Contractors →</button>
+    </div>
+
+    <!-- QUOTATION REQUEST TRACKER -->
+    <div class="section-title-row">
+      <h3>Your Quotation Requests</h3>
+      <a href="browse.html" style="font-size:13px; color:var(--amber); font-weight:500;">+ Notify more contractors</a>
+    </div>
+
+    <div style="background:var(--white); border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-bottom:40px;">
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th>Contractor</th>
+            <th>Project</th>
+            <th>Sent</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="req-name-cell">
+                <div class="req-avatar">KR</div>
+                Kunal Raut Constructions
+              </div>
+            </td>
+            <td>4BHK Interior, Powai</td>
+            <td style="color:var(--ink-dim)">2 days ago</td>
+            <td><span class="status-pill status-called">Called you back</span></td>
+            <td><a href="contractor-profile.html" style="font-size:13px; color:var(--amber); font-weight:500;">View profile</a></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="req-name-cell">
+                <div class="req-avatar">SI</div>
+                Siddhi Interiors &amp; Fitout
+              </div>
+            </td>
+            <td>4BHK Interior, Powai</td>
+            <td style="color:var(--ink-dim)">2 days ago</td>
+            <td><span class="status-pill status-called">Called you back</span></td>
+            <td><a href="contractor-profile.html" style="font-size:13px; color:var(--amber); font-weight:500;">View profile</a></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="req-name-cell">
+                <div class="req-avatar">PM</div>
+                Prakash MEP Solutions
+              </div>
+            </td>
+            <td>Office Rewiring, Navi Mumbai</td>
+            <td style="color:var(--ink-dim)">5 days ago</td>
+            <td><span class="status-pill status-pending">Awaiting response</span></td>
+            <td><a href="contractor-profile.html" style="font-size:13px; color:var(--amber); font-weight:500;">View profile</a></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="req-name-cell">
+                <div class="req-avatar">VW</div>
+                Varma Waterproofing Co.
+              </div>
+            </td>
+            <td>Terrace Leak Repair, Bandra</td>
+            <td style="color:var(--ink-dim)">1 week ago</td>
+            <td><span class="status-pill status-declined">No response</span></td>
+            <td><a href="contractor-profile.html" style="font-size:13px; color:var(--amber); font-weight:500;">View profile</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
