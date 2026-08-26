@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browse Contractors — BuildBridge</title>
+<link rel="stylesheet" href="style.css">
+<style>
+
+/* PAGE HEADER */
+.page-head {
+  background: var(--charcoal);
+  color: var(--paper);
+  padding: 48px 0 40px;
+}
+.page-head .eyebrow { color: var(--amber-soft); margin-bottom: 14px; }
+.page-head .eyebrow::before { background: var(--amber-soft); }
+.page-head h1 { font-family: var(--display); font-weight: 700; font-size: clamp(28px, 3.6vw, 38px); letter-spacing: -0.015em; margin-bottom: 20px; }
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  background: var(--charcoal-soft);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  padding: 6px;
+  max-width: 640px;
+}
+.search-bar input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--paper);
+  font-family: var(--body);
+  font-size: 14.5px;
+  padding: 10px 14px;
+}
+.search-bar input::placeholder { color: rgba(246,244,239,0.4); }
+.search-bar input:focus { outline: none; }
+
+/* LAYOUT: filters + results */
+.browse-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 40px;
+  align-items: start;
+  padding: 40px 0 100px;
+}
+
+/* FILTER SIDEBAR */
+.filters {
+  position: sticky;
+  top: 92px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 24px;
+}
+
+.filter-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.filter-head h3 { font-family: var(--display); font-weight: 600; font-size: 15px; }
+.filter-clear { font-size: 12.5px; color: var(--amber); font-weight: 500; }
+
+.filter-group { margin-bottom: 26px; padding-bottom: 26px; border-bottom: 1px solid var(--line); }
+.filter-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.filter-label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 14px;
+  display: block;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-family: var(--body);
+  font-size: 13.5px;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  padding: 7px 0;
+  cursor: pointer;
+}
+.check-row input { width: 15px; height: 15px; accent-color: var(--amber); flex-shrink: 0; }
+.check-row .count { margin-left: auto; color: var(--ink-dim); font-size: 12px; font-family: var(--mono); }
+
+.range-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.range-row input[type="range"] { flex: 1; accent-color: var(--amber); }
+.range-val { font-family: var(--mono); font-size: 12px; color: var(--ink-dim); white-space: nowrap; }
+
+.star-filter { display: flex; gap: 6px; }
+.star-opt {
+  flex: 1;
+  text-align: center;
+  padding: 8px 4px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.star-opt:hover, .star-opt.active { border-color: var(--amber); color: var(--amber); background: rgba(212,115,42,0.06); }
+
+/* RESULTS */
+.results-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+.results-count { font-size: 14px; color: var(--ink-dim); }
+.results-count b { color: var(--ink); font-weight: 600; }
+
+.sort-select {
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 13px;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.compare-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--charcoal);
+  color: var(--paper);
+  border-radius: 6px;
+  padding: 14px 20px;
+  margin-bottom: 22px;
+}
+.compare-bar-left { display: flex; align-items: center; gap: 12px; font-size: 13.5px; }
+.compare-chip {
+  background: rgba(255,255,255,0.1);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare-chip button { color: rgba(246,244,239,0.6); font-size: 14px; line-height: 1; }
+
+/* RESULT CARD (wider, more info than homepage preview) */
+.result-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 26px;
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 24px;
+  align-items: start;
+  transition: border-color 0.15s ease;
+}
+.result-card:hover { border-color: var(--charcoal); }
+
+.rc-check { padding-top: 6px; }
+.rc-check input { width: 17px; height: 17px; accent-color: var(--amber); }
+
+.rc-avatar {
+  width: 58px; height: 58px;
+  border-radius: 8px;
+  background: var(--charcoal);
+  color: var(--amber-soft);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rc-main { min-width: 0; }
+.rc-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+.rc-name-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rc-name { font-family: var(--display); font-weight: 600; font-size: 18px; }
+.rc-loc { font-size: 13px; color: var(--ink-dim); margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+
+.rc-tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0; }
+.rc-tag { font-size: 11.5px; font-weight: 500; padding: 4px 10px; background: var(--paper-dim); border-radius: 20px; color: var(--ink-dim); }
+
+.rc-badges { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.rc-rating { display: flex; align-items: center; gap: 6px; font-size: 13.5px; }
+.rc-rating .stars { color: var(--amber); letter-spacing: 1px; }
+.rc-rating .count { color: var(--ink-dim); font-size: 12.5px; }
+
+.rc-worked-with { font-size: 12.5px; color: var(--ink-dim); }
+.rc-worked-with b { color: var(--ink); font-weight: 600; }
+
+.rc-stats-row { display: flex; gap: 28px; padding-top: 14px; border-top: 1px solid var(--line); }
+.rc-stat .n { font-family: var(--mono); font-weight: 600; font-size: 16px; display: block; }
+.rc-stat .l { font-size: 11.5px; color: var(--ink-dim); }
+
+.rc-actions { display: flex; flex-direction: column; gap: 8px; width: 150px; flex-shrink: 0; }
+
+@media (max-width: 980px) {
+  .browse-layout { grid-template-columns: 1fr; }
+  .filters { position: static; }
+}
+
+@media (max-width: 700px) {
+  .result-card { grid-template-columns: 1fr; }
+  .rc-check { display: none; }
+  .rc-actions { width: 100%; flex-direction: row; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-mark"></span>
+      BuildBridge
+    </a>
+    <div class="nav-links">
+      <a href="browse.html" class="active">Browse Contractors</a>
+      <a href="index.html#how-it-works">How It Works</a>
+      <a href="index.html#model">For Suppliers</a>
+      <a href="dashboard.html">Post a Project</a>
+    </div>
+    <div class="nav-cta-group">
+      <a href="#" class="nav-signin">Sign in</a>
+      <a href="dashboard.html" class="btn btn-amber btn-sm">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEAD -->
+<header class="page-head">
+  <div class="wrap">
+    <div class="eyebrow">2,340+ Licensed Contractors</div>
+    <h1>Find your contractor by location &amp; trade</h1>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by name, trade, or area — e.g. &quot;waterproofing Andheri&quot;">
+      <button class="btn btn-amber btn-sm">Search</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap browse-layout">
+
+  <!-- FILTERS -->
+  <aside class="filters">
+    <div class="filter-head">
+      <h3>Filters</h3>
+      <button class="filter-clear" id="clearFilters">Clear all</button>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Location</span>
+      <select class="filter-select" id="locationFilter">
+        <option value="">All of Mumbai MMR</option>
+        <option>Andheri</option>
+        <option>Bandra</option>
+        <option>Thane</option>
+        <option>Navi Mumbai</option>
+        <option>Powai</option>
+        <option>Borivali</option>
+        <option>Dadar</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Type of Work</span>
+      <label class="check-row"><input type="checkbox" checked> RCC &amp; Structural <span class="count">412</span></label>
+      <label class="check-row"><input type="checkbox" checked> Interior Fit-out <span class="count">380</span></label>
+      <label class="check-row"><input type="checkbox" checked> Electrical &amp; MEP <span class="count">298</span></label>
+      <label class="check-row"><input type="checkbox" checked> Plumbing <span class="count">265</span></label>
+      <label class="check-row"><input type="checkbox" checked> Waterproofing <span class="count">201</span></label>
+      <label class="check-row"><input type="checkbox" checked> Facade &amp; Cladding <span class="count">146</span></label>
+      <label class="check-row"><input type="checkbox" checked> HVAC <span class="count">118</span></label>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Minimum Rating</span>
+      <div class="star-filter">
+        <div class="star-opt">3+</div>
+        <div class="star-opt">3.5+</div>
+        <div class="star-opt active">4+</div>
+        <div class="star-opt">4.5+</div>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Avg. Project Value</span>
+      <div class="range-row">
+        <input type="range" min="0" max="500" value="500" id="valueRange">
+      </div>
+      <div class="range-val" id="valueLabel">Up to ₹5 Cr+</div>
+    </div>
+
+    <div class="filter-group" style="border-bottom:none; padding-bottom:0; margin-bottom:0;">
+      <label class="check-row"><input type="checkbox" checked> Verified profiles only</label>
+      <label class="check-row"><input type="checkbox"> Available this month</label>
+    </div>
+  </aside>
+
+  <!-- RESULTS -->
+  <div>
+    <div class="compare-bar" id="compareBar" style="display:none">
+      <div class="compare-bar-left">
+        <span>Comparing:</span>
+        <div class="compare-chip">Kunal Raut Constructions <button>×</button></div>
+        <div class="compare-chip">Siddhi Interiors <button>×</button></div>
+      </div>
+      <a href="compare.html" class="btn btn-amber btn-sm">Compare Now</a>
+    </div>
+
+    <div class="results-head">
+      <span class="results-count"><b>247</b> contractors match your filters</span>
+      <select class="sort-select">
+        <option>Sort: Highest rated</option>
+        <option>Sort: Most projects</option>
+        <option>Sort: Highest value</option>
+        <option>Sort: Recently active</option>
+      </select>
+    </div>
+
+    <!-- RESULT 1 -->
+    <div class="result-card">
+      <div class="rc-check"><input type="checkbox"></div>
+      <div class="rc-avatar">KR</div>
+      <div class="rc-main">
+        <div class="rc-top-row">
+          <div>
+            <div class="rc-name-group">
+              <a href="contractor-profile.html" class="rc-name">Kunal Raut Constructions</a>
+              <span class="stamp"><span class="stamp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Verified</span>
+            </div>
+            <div class="rc-loc">📍 Thane, Mumbai MMR &nbsp;·&nbsp; License MH/RCC/08812</div>
+          </div>
+        </div>
+        <div class="rc-tags">
+          <span class="rc-tag">RCC &amp; Structural</span>
+          <span class="rc-tag">Waterproofing</span>
+          <span class="rc-tag">15+ years</span>
+        </div>
+        <div class="rc-badges">
+          <div class="rc-rating"><span class="stars">★★★★★</span> <b>4.9</b> <span class="count">(112 reviews)</span></div>
+          <div class="rc-worked-with">Worked with <b>Vasudha Group</b>, <b>Konkan Realty</b></div>
+        </div>
+        <div class="rc-stats-row">
+          <div class="rc-stat"><span class="n">47</span><span class="l">Projects done</span></div>
+          <div class="rc-stat"><span class="n">₹1.8 Cr</span><span class="l">Avg. project value</span></div>
+          <div class="rc-stat"><span class="n">₹84 Cr</span><span class="l">Total delivered</span></div>
+        </div>
+      </div>
+      <div class="rc-actions">
+        <a href="contractor-profile.html" class="btn btn-dark btn-sm btn-block">View Profile</a>
+        <button class="btn btn-outline-dark btn-sm btn-block">Request Quote</button>
+      </div>
+    </div>
+
+    <!-- RESULT 2 -->
+    <div class="result-card">
+      <div class="rc-check"><input type="checkbox"></div>
+      <div class="rc-avatar">SI</div>
+      <div class="rc-main">
+        <div class="rc-top-row">
+          <div>
+            <div class="rc-name-group">
+              <a href="contractor-profile.html" class="rc-name">Siddhi Interiors &amp; Fitout</a>
+              <span class="stamp"><span class="stamp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Verified</span>
+            </div>
+            <div class="rc-loc">📍 Andheri West, Mumbai &nbsp;·&nbsp; License MH/INT/04471</div>
+          </div>
+        </div>
+        <div class="rc-tags">
+          <span class="rc-tag">Interior Fit-out</span>
+          <span class="rc-tag">Carpentry</span>
+          <span class="rc-tag">8+ years</span>
+        </div>
+        <div class="rc-badges">
+          <div class="rc-rating"><span class="stars">★★★★★</span> <b>4.8</b> <span class="count">(76 reviews)</span></div>
+          <div class="rc-worked-with">Worked with <b>Shreeji Builders</b>, <b>Anantara Estates</b></div>
+        </div>
+        <div class="rc-stats-row">
+          <div class="rc-stat"><span class="n">31</span><span class="l">Projects done</span></div>
+          <div class="rc-stat"><span class="n">₹62 L</span><span class="l">Avg. project value</span></div>
+          <div class="rc-stat"><span class="n">₹19 Cr</span><span class="l">Total delivered</span></div>
+        </div>
+      </div>
+      <div class="rc-actions">
+        <a href="contractor-profile.html" class="btn btn-dark btn-sm btn-block">View Profile</a>
+        <button class="btn btn-outline-dark btn-sm btn-block">Request Quote</button>
+      </div>
+    </div>
+
+    <!-- RESULT 3 -->
+    <div class="result-card">
+      <div class="rc-check"><input type="checkbox"></div>
+      <div class="rc-avatar">PM</div>
+      <div class="rc-main">
+        <div class="rc-top-row">
+          <div>
+            <div class="rc-name-group">
+              <a href="contractor-profile.html" class="rc-name">Prakash MEP Solutions</a>
+              <span class="stamp"><span class="stamp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Verified</span>
+            </div>
+            <div class="rc-loc">📍 Navi Mumbai &nbsp;·&nbsp; License MH/ELE/11203</div>
+          </div>
+        </div>
+        <div class="rc-tags">
+          <span class="rc-tag">Electrical</span>
+          <span class="rc-tag">HVAC</span>
+          <span class="rc-tag">11+ years</span>
+        </div>
+        <div class="rc-badges">
+          <div class="rc-rating"><span class="stars">★★★★☆</span> <b>4.6</b> <span class="count">(58 reviews)</span></div>
+          <div class="rc-worked-with">Worked with <b>Marisa Developers</b></div>
+        </div>
+        <div class="rc-stats-row">
+          <div class="rc-stat"><span class="n">24</span><span class="l">Projects done</span></div>
+          <div class="rc-stat"><span class="n">₹95 L</span><span class="l">Avg. project value</span></div>
+          <div class="rc-stat"><span class="n">₹22.8 Cr</span><span class="l">Total delivered</span></div>
+        </div>
+      </div>
+      <div class="rc-actions">
+        <a href="contractor-profile.html" class="btn btn-dark btn-sm btn-block">View Profile</a>
+        <button class="btn btn-outline-dark btn-sm btn-block">Request Quote</button>
+      </div>
+    </div>
+
+    <!-- RESULT 4 -->
+    <div class="result-card">
+      <div class="rc-check"><input type="checkbox"></div>
+      <div class="rc-avatar">VW</div>
+      <div class="rc-main">
+        <div class="rc-top-row">
+          <div>
+            <div class="rc-name-group">
+              <a href="contractor-profile.html" class="rc-name">Varma Waterproofing Co.</a>
+              <span class="stamp"><span class="stamp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Verified</span>
+            </div>
+            <div class="rc-loc">📍 Powai, Mumbai &nbsp;·&nbsp; License MH/WP/06654</div>
+          </div>
+        </div>
+        <div class="rc-tags">
+          <span class="rc-tag">Waterproofing</span>
+          <span class="rc-tag">Terrace &amp; Basement</span>
+          <span class="rc-tag">6+ years</span>
+        </div>
+        <div class="rc-badges">
+          <div class="rc-rating"><span class="stars">★★★★☆</span> <b>4.5</b> <span class="count">(41 reviews)</span></div>
+          <div class="rc-worked-with">Worked with <b>Konkan Realty</b></div>
+        </div>
+        <div class="rc-stats-row">
+          <div class="rc-stat"><span class="n">19</span><span class="l">Projects done</span></div>
+          <div class="rc-stat"><span class="n">₹34 L</span><span class="l">Avg. project value</span></div>
+          <div class="rc-stat"><span class="n">₹6.5 Cr</span><span class="l">Total delivered</span></div>
+        </div>
+      </div>
+      <div class="rc-actions">
+        <a href="contractor-profile.html" class="btn btn-dark btn-sm btn-block">View Profile</a>
+        <button class="btn btn-outline-dark btn-sm btn-block">Request Quote</button>
+      </div>
+    </div>
+
+    <!-- RESULT 5 -->
+    <div class="result-card">
+      <div class="rc-check"><input type="checkbox"></div>
+      <div class="rc-avatar">AF</div>
+      <div class="rc-main">
+        <div class="rc-top-row">
+          <div>
+            <div class="rc-name-group">
+              <a href="contractor-profile.html" class="rc-name">Ashiyana Facade Works</a>
+              <span class="stamp"><span class="stamp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Verified</span>
+            </div>
+            <div class="rc-loc">📍 Bandra, Mumbai &nbsp;·&nbsp; License MH/FAC/02981</div>
+          </div>
+        </div>
+        <div class="rc-tags">
+          <span class="rc-tag">Facade &amp; Cladding</span>
+          <span class="rc-tag">Glazing</span>
+          <span class="rc-tag">13+ years</span>
+        </div>
+        <div class="rc-badges">
+          <div class="rc-rating"><span class="stars">★★★★★</span> <b>4.7</b> <span class="count">(64 reviews)</span></div>
+          <div class="rc-worked-with">Worked with <b>Vasudha Group</b>, <b>Marisa Developers</b></div>
+        </div>
+        <div class="rc-stats-row">
+          <div class="rc-stat"><span class="n">28</span><span class="l">Projects done</span></div>
+          <div class="rc-stat"><span class="n">₹2.1 Cr</span><span class="l">Avg. project value</span></div>
+          <div class="rc-stat"><span class="n">₹58.8 Cr</span><span class="l">Total delivered</span></div>
+        </div>
+      </div>
+      <div class="rc-actions">
+        <a href="contractor-profile.html" class="btn btn-dark btn-sm btn-block">View Profile</a>
+        <button class="btn btn-outline-dark btn-sm btn-block">Request Quote</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <span class="nav-logo-mark"></span>
+          BuildBridge
+        </div>
+        <p class="footer-desc">Connecting developers, licensed contractors, and material suppliers on one verified network.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="browse.html">Browse Contractors</a></li>
+          <li><a href="dashboard.html">Post a Project</a></li>
+          <li><a href="index.html#how-it-works">How It Works</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>For Business</h4>
+        <ul>
+          <li><a href="#">Register as Contractor</a></li>
+          <li><a href="#">Register as Supplier</a></li>
+          <li><a href="#">Verification Process</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Terms &amp; Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 BuildBridge. All rights reserved.</span>
+      <span>Mumbai, India</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Compare bar: show when 2+ checkboxes on result cards are checked
+const resultChecks = document.querySelectorAll('.rc-check input');
+const compareBar = document.getElementById('compareBar');
+resultChecks.forEach(cb => {
+  cb.addEventListener('change', () => {
+    const checked = document.querySelectorAll('.rc-check input:checked');
+    compareBar.style.display = checked.length >= 1 ? 'flex' : 'none';
+  });
+});
+
+// Star rating filter toggle
+document.querySelectorAll('.star-opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.star-opt').forEach(o => o.classList.remove('active'));
+    opt.classList.add('active');
+  });
+});
+
+// Value range label
+const valueRange = document.getElementById('valueRange');
+const valueLabel = document.getElementById('valueLabel');
+valueRange.addEventListener('input', () => {
+  const v = valueRange.value;
+  valueLabel.textContent = v >= 500 ? 'Up to ₹5 Cr+' : `Up to ₹${v} L`;
+});
+
+// Clear filters
+document.getElementById('clearFilters').addEventListener('click', () => {
+  document.querySelectorAll('.filter-group input[type="checkbox"]').forEach(cb => cb.checked = true);
+  document.getElementById('locationFilter').value = '';
+  document.querySelectorAll('.star-opt').forEach(o => o.classList.remove('active'));
+  document.querySelector('.star-opt:nth-child(3)').classList.add('active');
+  valueRange.value = 500;
+  valueLabel.textContent = 'Up to ₹5 Cr+';
+});
+</script>
+
+</body>
+</html>
