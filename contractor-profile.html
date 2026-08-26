@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kunal Raut Constructions — BuildBridge</title>
+<link rel="stylesheet" href="style.css">
+<style>
+
+.crumb { font-size: 13px; color: var(--ink-dim); padding: 20px 0; }
+.crumb a { color: var(--ink-dim); }
+.crumb a:hover { color: var(--amber); }
+.crumb span { margin: 0 6px; }
+
+/* PROFILE HEADER */
+.profile-header {
+  background: var(--charcoal);
+  color: var(--paper);
+  padding: 44px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+.profile-header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+.ph-inner { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; flex-wrap: wrap; padding-bottom: 36px; }
+
+.ph-left { display: flex; gap: 20px; }
+.ph-avatar {
+  width: 84px; height: 84px;
+  border-radius: 10px;
+  background: var(--charcoal-soft);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--amber-soft);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ph-name-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.ph-name { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: -0.015em; }
+
+.ph-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13.5px; color: rgba(246,244,239,0.6); margin-bottom: 14px; }
+.ph-meta span { display: flex; align-items: center; gap: 6px; }
+
+.ph-rating-row { display: flex; align-items: center; gap: 10px; }
+.ph-rating-row .stars { color: var(--amber); letter-spacing: 2px; font-size: 16px; }
+.ph-rating-row .num { font-family: var(--mono); font-weight: 600; font-size: 15px; }
+.ph-rating-row .count { color: rgba(246,244,239,0.55); font-size: 13.5px; }
+
+.ph-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.ph-stats-strip {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.ph-stat { padding: 22px 0; text-align: center; border-right: 1px solid rgba(255,255,255,0.1); }
+.ph-stat:last-child { border-right: none; }
+.ph-stat .n { font-family: var(--mono); font-weight: 600; font-size: 22px; display: block; margin-bottom: 4px; }
+.ph-stat .l { font-size: 12px; color: rgba(246,244,239,0.5); }
+
+@media (max-width: 720px) { .ph-stats-strip { grid-template-columns: repeat(2, 1fr); } .ph-stat:nth-child(2) { border-right: none; } }
+
+/* CONTENT LAYOUT */
+.profile-layout { display: grid; grid-template-columns: 1fr 320px; gap: 44px; padding: 48px 0 100px; align-items: start; }
+
+.tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--line); margin-bottom: 32px; }
+.tab { padding: 12px 4px; margin-right: 24px; font-size: 14.5px; font-weight: 500; color: var(--ink-dim); border-bottom: 2px solid transparent; cursor: pointer; }
+.tab.active { color: var(--charcoal); border-bottom-color: var(--amber); }
+
+/* WORKED WITH */
+.worked-with-box {
+  background: var(--verified-soft);
+  border: 1px solid rgba(61,90,64,0.2);
+  border-radius: 6px;
+  padding: 20px 22px;
+  margin-bottom: 36px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.wwb-icon { width: 34px; height: 34px; border-radius: 50%; background: var(--verified); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.wwb-icon svg { width: 16px; height: 16px; }
+.wwb-text { font-size: 13.5px; color: var(--verified); line-height: 1.5; }
+.wwb-text b { font-weight: 700; }
+
+/* PROJECTS GRID */
+.section-label { font-family: var(--display); font-weight: 600; font-size: 19px; margin-bottom: 20px; }
+
+.projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 48px; }
+
+.project-card { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--white); position: relative; }
+.project-img {
+  height: 150px;
+  background: linear-gradient(135deg, #4A4E55, #2A2D32);
+  position: relative;
+}
+.project-img::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(45deg, rgba(212,115,42,0.12) 0, rgba(212,115,42,0.12) 2px, transparent 2px, transparent 16px);
+}
+.project-body { padding: 18px 20px; }
+.project-title { font-family: var(--display); font-weight: 600; font-size: 15.5px; margin-bottom: 6px; }
+.project-client { font-size: 12.5px; color: var(--ink-dim); margin-bottom: 12px; }
+.project-meta-row { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--line); }
+.project-val { font-family: var(--mono); font-weight: 600; font-size: 14px; color: var(--amber); }
+.project-year { font-size: 12px; color: var(--ink-dim); }
+
+/* REVIEWS */
+.review-card { border: 1px solid var(--line); border-radius: 6px; padding: 22px; margin-bottom: 14px; }
+.review-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.review-author { display: flex; gap: 12px; align-items: center; }
+.review-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--paper-dim); display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 600; font-size: 13px; color: var(--charcoal); }
+.review-name { font-weight: 600; font-size: 14px; }
+.review-role { font-size: 12px; color: var(--ink-dim); }
+.review-stars { color: var(--amber); letter-spacing: 1px; font-size: 13px; }
+.review-body { font-size: 14px; line-height: 1.65; color: var(--ink); margin: 12px 0; }
+.review-footer { display: flex; justify-content: space-between; align-items: center; }
+.review-project-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--verified);
+  background: var(--verified-soft);
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.review-date { font-size: 12px; color: var(--ink-dim); }
+
+/* SIDEBAR */
+.side-box { background: var(--white); border: 1px solid var(--line); border-radius: 6px; padding: 24px; margin-bottom: 20px; }
+.side-box h4 { font-family: var(--display); font-weight: 600; font-size: 15.5px; margin-bottom: 16px; }
+
+.detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.detail-row:last-child { border-bottom: none; }
+.detail-row .k { color: var(--ink-dim); }
+.detail-row .v { font-weight: 600; text-align: right; }
+.detail-row .v.mono { font-family: var(--mono); font-size: 12.5px; }
+
+.quote-form label { display: block; font-size: 12.5px; font-weight: 500; color: var(--ink-dim); margin-bottom: 6px; margin-top: 14px; }
+.quote-form label:first-child { margin-top: 0; }
+.quote-form input, .quote-form select, .quote-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-family: var(--body);
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.quote-form textarea { resize: vertical; min-height: 70px; }
+
+.sticky-side { position: sticky; top: 92px; }
+
+@media (max-width: 940px) {
+  .profile-layout { grid-template-columns: 1fr; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .sticky-side { position: static; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-mark"></span>
+      BuildBridge
+    </a>
+    <div class="nav-links">
+      <a href="browse.html" class="active">Browse Contractors</a>
+      <a href="index.html#how-it-works">How It Works</a>
+      <a href="index.html#model">For Suppliers</a>
+      <a href="dashboard.html">Post a Project</a>
+    </div>
+    <div class="nav-cta-group">
+      <a href="#" class="nav-signin">Sign in</a>
+      <a href="dashboard.html" class="btn btn-amber btn-sm">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap crumb">
+  <a href="browse.html">Browse Contractors</a><span>/</span><a href="browse.html">Thane</a><span>/</span> Kunal Raut Constructions
+</div>
+
+<!-- PROFILE HEADER -->
+<header class="profile-header">
+  <div class="wrap ph-inner">
+    <div class="ph-left">
+      <div class="ph-avatar">KR</div>
+      <div>
+        <div class="ph-name-row">
+          <span class="ph-name">Kunal Raut Constructions</span>
+          <span class="stamp"><span class="stamp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Verified</span>
+        </div>
+        <div class="ph-meta">
+          <span>📍 Thane, Mumbai MMR</span>
+          <span>🏗️ RCC &amp; Structural, Waterproofing</span>
+          <span>📅 15+ years in business</span>
+        </div>
+        <div class="ph-rating-row">
+          <span class="stars">★★★★★</span>
+          <span class="num">4.9</span>
+          <span class="count">(112 verified reviews)</span>
+        </div>
+      </div>
+    </div>
+    <div class="ph-actions">
+      <button class="btn btn-outline">💬 Message</button>
+      <button class="btn btn-outline">📞 Call</button>
+      <a href="#quote" class="btn btn-amber">Request Quotation</a>
+    </div>
+  </div>
+
+  <div class="wrap ph-stats-strip">
+    <div class="ph-stat"><span class="n">47</span><span class="l">Projects Completed</span></div>
+    <div class="ph-stat"><span class="n">₹84 Cr</span><span class="l">Total Value Delivered</span></div>
+    <div class="ph-stat"><span class="n">₹1.8 Cr</span><span class="l">Avg. Project Size</span></div>
+    <div class="ph-stat"><span class="n">98%</span><span class="l">On-Time Completion</span></div>
+  </div>
+</header>
+
+<div class="wrap profile-layout">
+
+  <!-- MAIN CONTENT -->
+  <div>
+    <div class="tabs">
+      <div class="tab active" data-tab="projects">Completed Projects</div>
+      <div class="tab" data-tab="reviews">Reviews (112)</div>
+      <div class="tab" data-tab="about">About &amp; Licenses</div>
+    </div>
+
+    <div class="worked-with-box">
+      <div class="wwb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+      <div class="wwb-text">Has completed verified projects for <b>Vasudha Group</b>, <b>Konkan Realty</b>, and <b>3 other</b> reputable developers on BuildBridge.</div>
+    </div>
+
+    <!-- PROJECTS TAB -->
+    <div id="tab-projects">
+      <div class="section-label">Completed Projects</div>
+      <div class="projects-grid">
+        <div class="project-card">
+          <div class="project-img"></div>
+          <div class="project-body">
+            <div class="project-title">Vasudha Heights — Phase 2</div>
+            <div class="project-client">Client: Vasudha Group · Residential, 18 floors</div>
+            <div class="project-meta-row">
+              <span class="project-val">₹4.2 Cr contract value</span>
+              <span class="project-year">2025</span>
+            </div>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-img"></div>
+          <div class="project-body">
+            <div class="project-title">Konkan Riverside Residency</div>
+            <div class="project-client">Client: Konkan Realty · Residential, 12 floors</div>
+            <div class="project-meta-row">
+              <span class="project-val">₹3.1 Cr contract value</span>
+              <span class="project-year">2024</span>
+            </div>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-img"></div>
+          <div class="project-body">
+            <div class="project-title">Om Sai Commercial Complex</div>
+            <div class="project-client">Client: Private developer · Commercial</div>
+            <div class="project-meta-row">
+              <span class="project-val">₹2.6 Cr contract value</span>
+              <span class="project-year">2024</span>
+            </div>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-img"></div>
+          <div class="project-body">
+            <div class="project-title">Thane Creek Bridge Foundation</div>
+            <div class="project-client">Client: Municipal contract · Infrastructure</div>
+            <div class="project-meta-row">
+              <span class="project-val">₹5.8 Cr contract value</span>
+              <span class="project-year">2023</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-outline-dark btn-sm">Load more projects</button>
+    </div>
+
+    <!-- REVIEWS -->
+    <div style="margin-top:52px">
+      <div class="section-label">What developers say</div>
+
+      <div class="review-card">
+        <div class="review-top">
+          <div class="review-author">
+            <div class="review-avatar">RM</div>
+            <div>
+              <div class="review-name">Rohan Mehta</div>
+              <div class="review-role">Project Lead, Vasudha Group</div>
+            </div>
+          </div>
+          <span class="review-stars">★★★★★</span>
+        </div>
+        <p class="review-body">Kunal's team handled our Phase 2 structural work with zero delays across 18 floors. Communication was clear throughout and they flagged a rebar spec issue before it became expensive to fix. Would use again without hesitation.</p>
+        <div class="review-footer">
+          <span class="review-project-tag"><span class="stamp-icon" style="width:12px;height:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Verified project: Vasudha Heights Phase 2</span>
+          <span class="review-date">3 months ago</span>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-top">
+          <div class="review-author">
+            <div class="review-avatar">SP</div>
+            <div>
+              <div class="review-name">Sanjana Poddar</div>
+              <div class="review-role">Site Owner, Konkan Realty</div>
+            </div>
+          </div>
+          <span class="review-stars">★★★★★</span>
+        </div>
+        <p class="review-body">Pricing was fair and matched the initial quote almost exactly, only one minor variation for a foundation soil issue that wasn't visible until excavation. Their waterproofing sub-team was excellent too.</p>
+        <div class="review-footer">
+          <span class="review-project-tag"><span class="stamp-icon" style="width:12px;height:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Verified project: Konkan Riverside Residency</span>
+          <span class="review-date">7 months ago</span>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-top">
+          <div class="review-author">
+            <div class="review-avatar">AJ</div>
+            <div>
+              <div class="review-name">Amit Joshi</div>
+              <div class="review-role">Independent Developer</div>
+            </div>
+          </div>
+          <span class="review-stars">★★★★☆</span>
+        </div>
+        <p class="review-body">Solid structural work overall. Timeline slipped by about two weeks due to monsoon delays which was communicated in advance, so no complaints there. Would recommend for mid-size commercial builds.</p>
+        <div class="review-footer">
+          <span class="review-project-tag"><span class="stamp-icon" style="width:12px;height:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Verified project: Om Sai Commercial Complex</span>
+          <span class="review-date">11 months ago</span>
+        </div>
+      </div>
+
+      <button class="btn btn-outline-dark btn-sm">Show all 112 reviews</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sticky-side">
+    <div class="side-box">
+      <h4>Business Details</h4>
+      <div class="detail-row"><span class="k">License Number</span><span class="v mono">MH/RCC/08812</span></div>
+      <div class="detail-row"><span class="k">Registered Since</span><span class="v">March 2011</span></div>
+      <div class="detail-row"><span class="k">Team Size</span><span class="v">80–120 workers</span></div>
+      <div class="detail-row"><span class="k">GST Registered</span><span class="v">Yes</span></div>
+      <div class="detail-row"><span class="k">Insurance Cover</span><span class="v">Yes, ₹2 Cr</span></div>
+    </div>
+
+    <div class="side-box quote-form" id="quote">
+      <h4>Request a Quotation</h4>
+      <label>Your name</label>
+      <input type="text" placeholder="Full name">
+      <label>Project type</label>
+      <select>
+        <option>RCC &amp; Structural</option>
+        <option>Waterproofing</option>
+        <option>Full construction</option>
+      </select>
+      <label>Estimated budget range</label>
+      <select>
+        <option>Under ₹50 L</option>
+        <option>₹50 L – ₹1 Cr</option>
+        <option>₹1 Cr – ₹3 Cr</option>
+        <option>₹3 Cr+</option>
+      </select>
+      <label>Project details</label>
+      <textarea placeholder="Location, timeline, scope..."></textarea>
+      <label>Phone number</label>
+      <input type="tel" placeholder="+91 00000 00000">
+      <button class="btn btn-amber btn-block" style="margin-top:18px">Send Request</button>
+      <p style="font-size:11.5px; color:var(--ink-dim); margin-top:10px; line-height:1.5;">Kunal Raut Constructions will be notified instantly and can call you directly to discuss.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <span class="nav-logo-mark"></span>
+          BuildBridge
+        </div>
+        <p class="footer-desc">Connecting developers, licensed contractors, and material suppliers on one verified network.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="browse.html">Browse Contractors</a></li>
+          <li><a href="dashboard.html">Post a Project</a></li>
+          <li><a href="index.html#how-it-works">How It Works</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>For Business</h4>
+        <ul>
+          <li><a href="#">Register as Contractor</a></li>
+          <li><a href="#">Register as Supplier</a></li>
+          <li><a href="#">Verification Process</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Terms &amp; Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 BuildBridge. All rights reserved.</span>
+      <span>Mumbai, India</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
